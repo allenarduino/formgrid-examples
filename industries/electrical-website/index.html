@@ -354,7 +354,7 @@
   const submitBtn = document.getElementById('submit-btn');
 
   // Replace YOUR-FORM-ID with the real Formgrid form ID before going live
-  const FORMGRID_ENDPOINT = 'https://formgrid.dev/api/f/YOUR-FORM-ID';
+  const FORMGRID_ENDPOINT = 'https://formgrid.dev/api/f/29ap3m4t';
 
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -367,19 +367,12 @@
     submitBtn.textContent = 'Sending...';
 
     const data = new FormData(form);
-    const payload = {
-      name: data.get('name'),
-      phone: data.get('phone'),
-      email: data.get('email'),
-      service: data.get('service'),
-      message: data.get('message')
-    };
+    data.delete('_honey');
 
     try {
       const res = await fetch(FORMGRID_ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(payload)
+        body: data
       });
 
       if (res.ok) {
