@@ -280,7 +280,7 @@
           <p>Thanks, we'll be in touch shortly to schedule a time.</p>
         </div>
 
-        <form id="quote-form">
+        <form id="quote-form" action="https://formgrid.dev/api/f/29ap3m4t" method="POST" target="formgrid-frame">
           <div class="field-row">
             <div class="field">
               <label for="name">Full name</label>
@@ -346,46 +346,38 @@
   </div>
 </footer>
 
+<iframe name="formgrid-frame" id="formgrid-frame" title="Form submission" hidden></iframe>
+
 <script src="nav.js"></script>
 <script>
   const form = document.getElementById('quote-form');
   const successEl = document.getElementById('form-success');
   const errorEl = document.getElementById('form-error');
   const submitBtn = document.getElementById('submit-btn');
+  const formFrame = document.getElementById('formgrid-frame');
+  let waitingForSubmit = false;
 
-  // Replace YOUR-FORM-ID with the real Formgrid form ID before going live
-  const FORMGRID_ENDPOINT = 'https://formgrid.dev/api/f/29ap3m4t';
+  formFrame.addEventListener('load', function () {
+    if (!waitingForSubmit) return;
+    waitingForSubmit = false;
+    form.style.display = 'none';
+    successEl.style.display = 'block';
+  });
 
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-
+  form.addEventListener('submit', function (e) {
     const honey = form.elements['_honey'].value;
-    if (honey) return; // silently drop bot submissions
+    if (honey) {
+      e.preventDefault();
+      return;
+    }
 
+    e.preventDefault();
     errorEl.style.display = 'none';
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending...';
-
-    const data = new FormData(form);
-    data.delete('_honey');
-
-    try {
-      const res = await fetch(FORMGRID_ENDPOINT, {
-        method: 'POST',
-        body: data
-      });
-
-      if (res.ok) {
-        form.style.display = 'none';
-        successEl.style.display = 'block';
-      } else {
-        throw new Error('Request failed');
-      }
-    } catch (err) {
-      errorEl.style.display = 'block';
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Send Request';
-    }
+    form.elements['_honey'].disabled = true;
+    waitingForSubmit = true;
+    form.submit();
   });
 </script>
 
